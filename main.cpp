@@ -9,7 +9,7 @@ int main()
 {
     char input;
 
-    cout << "Sender (s/S) or Receiver (r/R)?" << endl;
+    cout << "Sender (S/s) or Receiver (R/r)?" << endl;
     cin >> input;
 
     input = toupper(input);
@@ -36,7 +36,7 @@ int main()
 
 int* sender()
 {
-    int bits,
+    int dataBits,
         redundantBits,
         parity;     //1 for even, 0 for odd
 
@@ -44,12 +44,12 @@ int* sender()
 
 
     cout << "How many data bits?" << endl;
-    cin >> bits;
-    while (pow(2, redundantBits) < (bits + redundantBits + 1))
+    cin >> dataBits;
+    while (pow(2, redundantBits) < (dataBits + redundantBits + 1))
     {
         redundantBits += 1;
     }
-    int totalBits = bits + redundantBits;
+    int totalBits = dataBits + redundantBits;
     int* set = new int[totalBits];
 
     cout << "What is the parity? (1 for even/0 for odd)" << endl;
@@ -65,6 +65,41 @@ int* sender()
             set[i] = input;
         }
     }
+
+    for (int i = 1; i <= totalBits; i++)
+    {
+        if ((i & (i - 1)) == 0)
+        {
+            int* group = new int [dataBits];
+
+            int count = 0;
+            int index = i;
+
+            while (count < dataBits)
+            {
+                int take = i,
+                    skip = i;
+
+                while (take > 0)
+                {
+                    group[count] = set[index];
+                    count += 1;
+                    index += 1;
+                    take -= 1;
+                }
+
+                while (skip > 0)
+                {
+                    index += 1;
+                    skip -= 1;
+                }
+            }
+
+
+            delete [] group;
+        }
+    }
+
 
     cout << "REVERSE" << endl;
     for (int i = totalBits; i > 0; i--)
