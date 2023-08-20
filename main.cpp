@@ -2,8 +2,10 @@
 #include <cmath>
 using namespace std;
 
-int* sender();
-int* receiver();
+void sender();
+void getInput(int& bits, int& par);
+
+void receiver();
 
 int main()
 {
@@ -11,7 +13,6 @@ int main()
 
     cout << "Sender (S/s) or Receiver (R/r)?" << endl;
     cin >> input;
-
     input = toupper(input);
 
     switch (input)
@@ -32,7 +33,7 @@ int main()
     return 0;
 }
 
-int* sender()
+void sender()
 {
     int dataBits,
         redundantBits,
@@ -40,9 +41,8 @@ int* sender()
 
     int input;
 
+    getInput(dataBits, parity);
 
-    cout << "How many data bits?" << endl;
-    cin >> dataBits;
     while (pow(2, redundantBits) < (dataBits + redundantBits + 1))
     {
         redundantBits += 1;
@@ -50,10 +50,6 @@ int* sender()
     int totalBits = dataBits + redundantBits;
     int* set = new int[totalBits];
 
-    cout << "What is the parity? (1 for odd/0 for even)" << endl;
-    cin >> parity;
-
-    int count = 0;
     for (int i = totalBits; i > 0; i--)
     {
         if ((i & (i - 1)) != 0)
@@ -97,39 +93,34 @@ int* sender()
             int numOnes = 0;
             for (int j = 1; j < dataBits; j++)
             {
-                if (group[j] == 1)
-                    numOnes += 1;
+                numOnes += group[j];
             }
 
             //Determine rBit based on parity
             int rBit;
-            if (parity == 1)
-                if (numOnes % 2 == 0)
-                    rBit = 1;
-                else
-                    rBit = 0;
-            
-            if (parity == 0)
-                if (numOnes % 2 == 0)
-                    rBit = 0;
-                else
-                    rBit = 1;
+            rBit = (numOnes + parity) % 2;
 
             set[i] = rBit;
-
-            cout << rBit << endl;
 
             delete [] group;
         }
     }
 
-    cout << "REVERSE" << endl;
+    cout << "Data Transmitted." << endl;
     for (int i = totalBits; i > 0; i--)
     {
-        cout << set[i] << endl;
+        cout << set[i];
     }
 
-    return set;
+}
+
+void getInput(int& bits, int& par)
+{
+    cout << "How many data bits?" << endl;
+    cin >> bits;
+
+    cout << "What is the parity? (1 for odd/0 for even)" << endl;
+    cin >> par;
 }
 
 int* receiver()
