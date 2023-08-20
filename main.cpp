@@ -29,8 +29,6 @@ int main()
             break;
     }
 
-
-
     return 0;
 }
 
@@ -38,7 +36,7 @@ int* sender()
 {
     int dataBits,
         redundantBits,
-        parity;     //1 for even, 0 for odd
+        parity;     //1 for odd, 0 for even
 
     int input;
 
@@ -52,7 +50,7 @@ int* sender()
     int totalBits = dataBits + redundantBits;
     int* set = new int[totalBits];
 
-    cout << "What is the parity? (1 for even/0 for odd)" << endl;
+    cout << "What is the parity? (1 for odd/0 for even)" << endl;
     cin >> parity;
 
     int count = 0;
@@ -94,12 +92,36 @@ int* sender()
                     skip -= 1;
                 }
             }
+            //Group is properly created
 
+            int numOnes = 0;
+            for (int j = 1; j < dataBits; j++)
+            {
+                if (group[j] == 1)
+                    numOnes += 1;
+            }
+
+            //Determine rBit based on parity
+            int rBit;
+            if (parity == 1)
+                if (numOnes % 2 == 0)
+                    rBit = 1;
+                else
+                    rBit = 0;
+            
+            if (parity == 0)
+                if (numOnes % 2 == 0)
+                    rBit = 0;
+                else
+                    rBit = 1;
+
+            set[i] = rBit;
+
+            cout << rBit << endl;
 
             delete [] group;
         }
     }
-
 
     cout << "REVERSE" << endl;
     for (int i = totalBits; i > 0; i--)
@@ -116,4 +138,3 @@ int* receiver()
 
     return set;
 }
-
