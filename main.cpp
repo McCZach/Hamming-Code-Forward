@@ -126,14 +126,16 @@ void getInput(int& bits, int& par)
 
 void receiver()
 {
-    int* set,
-         errorList;
+    int* set;
+    
+    int** errorList;
 
     int totalBits,
         redundantBits,
         dataBits,
         parity,     //1 for odd, 0 for even
-        input;
+        input,
+        total = 0;
 
 
     cout << "How many total bits were sent?" << endl;
@@ -150,6 +152,7 @@ void receiver()
 
     set = new int[totalBits];
     redundantBits = (totalBits - dataBits);
+    errorList = new int*[redundantBits];
 
     for (int i = totalBits; i > 0; i--)
     {
@@ -176,8 +179,8 @@ void receiver()
                 while (take > 0)
                 {
                     group[count] = set[index];
-                    indices[count] = i;
-                    
+                    indices[count] = index;
+
                     count += 1;
                     index += 1;
                     take -= 1;
@@ -198,10 +201,22 @@ void receiver()
             }
 
             if (numOnes % 2 != parity)
+            {
+                errorList[total] = indices;
+                total += 1;
+            }
 
+            cout << "INDICES" << endl;
+            for (int k = 0; k < dataBits; k++)
+            {
+                cout << indices[k] << " ";
+            }
+            cout << endl;
            
 
             delete [] group;
+            delete [] indices;
         }
     }
+
 }
