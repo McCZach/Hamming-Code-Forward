@@ -6,7 +6,7 @@ using namespace std;
 #include "AList.h"
 
 void sender();
-void getInput(int& bits, int& par);
+void getInputSender(int& bits, int& par);
 
 void receiver();
 
@@ -44,7 +44,7 @@ void sender()
 
     int input;
 
-    getInput(dataBits, parity);
+    getInputSender(dataBits, parity);
 
     while (pow(2, redundantBits) < (dataBits + redundantBits + 1))
     {
@@ -114,9 +114,11 @@ void sender()
     {
         cout << set[i];
     }
+
+    delete [] set;
 }
 
-void getInput(int& bits, int& par)
+void getInputSender(int& bits, int& par)
 {
     cout << "How many data bits? ";
     cin >> bits;
@@ -216,10 +218,6 @@ void receiver()
                 }
             }
 
-            //ALL INDICESE ADDED TO A DATABITS * REDUNDANT BITS ARRAY
-            //WHEN THERE IS AN ERROR, THOSE INDICES ADDED TO ERROR LIST
-            //THE NUMBER THAT APPEARS IN ERROR LIST BUT NOT TOTAL LIST IS THE INDEX TO FLIP
-
             binaryGroup.clear();
         }
     }
@@ -248,11 +246,12 @@ void receiver()
         *(set + errorIndex) %= 2;
         cout << "THE MESSAGE HAS BEEN FIXED!" << endl;
         cout << "THE CORRECTED MESSAGE IS NOW: ";
-
         for (int i = totalBits; i > 0; i--)
         {
             cout << *(set + i);
         }
+
     }
-    
+
+    delete [] set;
 }
