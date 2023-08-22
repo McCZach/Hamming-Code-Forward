@@ -3,6 +3,8 @@
 #include <string>
 using namespace std;
 
+#include "AList.h"
+
 void sender();
 void getInput(int& bits, int& par);
 
@@ -112,76 +114,79 @@ void sender()
     {
         cout << set[i];
     }
-
 }
 
 void getInput(int& bits, int& par)
 {
-    cout << "How many data bits?" << endl;
+    cout << "How many data bits? ";
     cin >> bits;
+    cout << endl;
 
-    cout << "What is the parity? (1 for odd/0 for even)" << endl;
+    cout << "What is the parity? (1 for odd/0 for even) ";
     cin >> par;
+    cout << endl;
 }
 
 void receiver()
 {
     int* set;
-    
-    int** errorList;
 
     int totalBits,
-        redundantBits,
         dataBits,
-        parity,     //1 for odd, 0 for even
+        parity,
+        redundantBits,
         input,
-        total = 0;
+        errorIndex;
 
+    bool found = false;
 
-    cout << "How many total bits were sent?" << endl;
+    cout << "How many total bits were received? ";
     cin >> totalBits;
     cout << endl;
 
-    cout << "How many bits is the message by sender?" << endl;
+    cout << "How many bits was the message by sender? ";
     cin >> dataBits;
     cout << endl;
 
-    cout << "What is the parity? (1 for odd/0 for even)" << endl;
+    cout << "What is the parity? (1 for odd/0 for even) ";
     cin >> parity;
     cout << endl;
 
     set = new int[totalBits];
-    redundantBits = (totalBits - dataBits);
-    errorList = new int*[redundantBits];
 
-    for (int i = totalBits; i > 0; i--)
+    redundantBits = (totalBits - dataBits);
+
+    AList<int> errorList(dataBits * redundantBits);
+    AList<int> indexList(dataBits * redundantBits);
+
+    for(int i = totalBits; i > 0; i--)
     {
         cout << "What was the bit transmitted? D" << i << endl;
         cin >> input;
         set[i] = input;
     }
+    cout << endl;
 
     for (int i = 1; i <= totalBits; i++)
     {
         if ((i & (i - 1)) == 0)
         {
-            int* group = new int [dataBits];
-            int* indices = new int[dataBits];
+            AList<int> binaryGroup(dataBits);
 
-            int count = 0;
-            int index = i;
+            int counter = 0,
+                index = i;
 
-            while (count < dataBits)
+            while (counter < dataBits)
             {
                 int take = i,
                     skip = i;
-
+                
                 while (take > 0)
                 {
-                    group[count] = set[index];
-                    indices[count] = index;
+                    binaryGroup.insertBack(set[index]);
+                    indexList.insertBack(index);
 
-                    count += 1;
+                    counter += 1;
                     index += 1;
                     take -= 1;
                 }
@@ -192,31 +197,62 @@ void receiver()
                     skip -= 1;
                 }
             }
-            //Group is properly created
 
             int numOnes = 0;
-            for (int j = 1; j < dataBits; j++)
+            for (int j = 0; j < dataBits; j++)
             {
-                numOnes += group[j];
+                int temp;
+                binaryGroup.retrieveAtIndex(temp, j);
+                numOnes += temp;
             }
 
             if (numOnes % 2 != parity)
             {
-                errorList[total] = indices;
-                total += 1;
+                for (int k = 0; k < dataBits; k++)
+                {
+                    int temp;
+                    indexList.removeBack(temp);
+                    errorList.insertBack(temp);
+                }
             }
 
-            cout << "INDICES" << endl;
-            for (int k = 0; k < dataBits; k++)
-            {
-                cout << indices[k] << " ";
-            }
-            cout << endl;
-           
+            //ALL INDICESE ADDED TO A DATABITS * REDUNDANT BITS ARRAY
+            //WHEN THERE IS AN ERROR, THOSE INDICES ADDED TO ERROR LIST
+            //THE NUMBER THAT APPEARS IN ERROR LIST BUT NOT TOTAL LIST IS THE INDEX TO FLIP
 
-            delete [] group;
-            delete [] indices;
+            binaryGroup.clear();
         }
     }
+   
+    if (!errorList.isEmpty())
+    {
+        while(!found)
+        {
+            int temp;
 
+            for (int i = 0; i < errorList.getNumValues(); i++)
+            {
+                errorList.retrieveAtIndex(temp, i);
+
+                if (!indexList.retrieve(temp))
+                {
+                    found = true;
+                    errorIndex = temp;
+                }
+            }
+        }
+
+        cout << "ERROR DETECTED IN TRANSMISSION!" << endl;
+        cout << "The Index: " << errorIndex << " needs to be flipped!" << endl;
+        *(set + errorIndex) += 1;
+        *(set + errorIndex) %= 2;
+        cout << "THE MESSAGE HAS BEEN FIXED!" << endl;
+        cout << "THE CORRECTED MESSAGE IS NOW: ";
+
+        for (int i = totalBits; i > 0; i--)
+        {
+            cout << *(set + i);
+        }
+    }
+    
 }
