@@ -9,6 +9,7 @@ void sender();
 void getInputSender(int& bits, int& par);
 
 void receiver();
+void getInputReciever(int & tBits, int & dBits, int & par);
 
 int main()
 {
@@ -129,6 +130,21 @@ void getInputSender(int& bits, int& par)
     cout << endl;
 }
 
+void getInputReciever(int & tBits, int & dBits, int & par)
+{
+    cout << "How many total bits were received? ";
+    cin >> tBits;
+    cout << endl;
+
+    cout << "How many bits was the message by sender? ";
+    cin >> dBits;
+    cout << endl;
+
+    cout << "What is the parity? (1 for odd/0 for even) ";
+    cin >> par;
+    cout << endl;
+}
+
 void receiver()
 {
     int* set;
@@ -142,17 +158,7 @@ void receiver()
 
     bool found = false;
 
-    cout << "How many total bits were received? ";
-    cin >> totalBits;
-    cout << endl;
-
-    cout << "How many bits was the message by sender? ";
-    cin >> dataBits;
-    cout << endl;
-
-    cout << "What is the parity? (1 for odd/0 for even) ";
-    cin >> parity;
-    cout << endl;
+    getInputReciever(totalBits, dataBits, parity);
 
     set = new int[totalBits];
 
